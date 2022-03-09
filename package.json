@@ -1,11 +1,11 @@
 {
-  "name": "mock-debug",
-  "displayName": "Mock Debug",
-  "version": "0.49.6",
+  "name": "flow-debug",
+  "displayName": "Flow Debug",
+  "version": "0.0.1",
   "publisher": "ms-vscode",
-  "description": "Starter extension for developing debug adapters for VS Code.",
+  "description": "Debugger extension for automation flows using Sirenia Manatee.",
   "author": {
-    "name": "Microsoft Corporation"
+    "name": "Sirenia"
   },
   "license": "MIT",
   "keywords": [
@@ -14,17 +14,17 @@
   "engines": {
     "vscode": "^1.64.0"
   },
-  "icon": "images/mock-debug-icon.png",
+  "icon": "images/mock-debug-icon.png", 
   "categories": [
     "Debuggers"
   ],
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-mock-debug.git"
+    "url": "https://github.com/sireniaeu/flow-debug-adapter.git"
   },
   "bugs": {
-    "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+    "url": "https://github.com/sireniaeu/flow-debug-adapter/issues"
   },
   "scripts": {
     "compile": "tsc -p ./",
@@ -45,6 +45,7 @@
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.0",
     "@types/node": "^14.14.37",
+    "@types/temp": "^0.9.1",
     "@types/vscode": "^1.64.0",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
@@ -59,18 +60,18 @@
     "mocha": "^9.2.0",
     "path-browserify": "^1.0.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.5.5",
+    "typescript": "^4.6.2",
     "url": "^0.11.0",
     "vsce": "^2.6.7"
   },
   "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",
   "activationEvents": [
-    "onDebugResolve:mock",
-    "onDebugDynamicConfigurations:mock",
-    "onCommand:extension.mock-debug.getProgramName",
-    "onCommand:extension.mock-debug.runEditorContents",
-    "onCommand:extension.mock-debug.debugEditorContents"
+    "onDebugResolve:flow",
+    "onDebugDynamicConfigurations:flow",
+    "onCommand:extension.flow-debug.getProgramName",
+    "onCommand:extension.flow-debug.runEditorContents",
+    "onCommand:extension.flow-debug.debugEditorContents"
   ],
   "workspaceTrust": {
     "request": "never"
@@ -79,65 +80,65 @@
     "menus": {
       "editor/title/run": [
         {
-          "command": "extension.mock-debug.runEditorContents",
-          "when": "resourceLangId == markdown",
+          "command": "extension.flow-debug.runEditorContents",
+          "when": "resourceLangId == javascript",
           "group": "navigation@1"
         },
         {
-          "command": "extension.mock-debug.debugEditorContents",
-          "when": "resourceLangId == markdown",
+          "command": "extension.flow-debug.debugEditorContents",
+          "when": "resourceLangId == javascript",
           "group": "navigation@2"
         }
       ],
       "commandPalette": [
         {
-          "command": "extension.mock-debug.debugEditorContents",
-          "when": "resourceLangId == markdown"
+          "command": "extension.flow-debug.debugEditorContents",
+          "when": "resourceLangId == javascript"
         },
         {
-          "command": "extension.mock-debug.runEditorContents",
-          "when": "resourceLangId == markdown"
+          "command": "extension.flow-debug.runEditorContents",
+          "when": "resourceLangId == javascript"
         }
       ],
       "debug/variables/context": [
         {
-          "command": "extension.mock-debug.toggleFormatting",
-          "when": "debugType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
+          "command": "extension.flow-debug.toggleFormatting",
+          "when": "debugType == 'flow' && debugProtocolVariableMenuContext == 'simple'"
         }
       ]
     },
     "commands": [
       {
-        "command": "extension.mock-debug.debugEditorContents",
-        "title": "Debug File",
-        "category": "Mock Debug",
+        "command": "extension.flow-debug.debugEditorContents",
+        "title": "Debug Manatee flow",
+        "category": "Flow Debug",
         "enablement": "!inDebugMode",
         "icon": "$(debug-alt)"
       },
       {
-        "command": "extension.mock-debug.runEditorContents",
-        "title": "Run File",
-        "category": "Mock Debug",
+        "command": "extension.flow-debug.runEditorContents",
+        "title": "Run Manatee flow",
+        "category": "Flow Debug",
         "enablement": "!inDebugMode",
         "icon": "$(play)"
       },
       {
-        "command": "extension.mock-debug.toggleFormatting",
+        "command": "extension.flow-debug.toggleFormatting",
         "title": "Toggle between decimal and hex formatting"
       }
     ],
     "breakpoints": [
       {
-        "language": "markdown"
+        "language": "javascript"
       }
     ],
     "debuggers": [
       {
-        "type": "mock",
+        "type": "flow",
         "languages": [
-          "markdown"
+          "javascript"
         ],
-        "label": "Mock Debug",
+        "label": "Flow Debug",
         "program": "./out/debugAdapter.js",
         "runtime": "node",
         "configurationAttributes": {
@@ -180,7 +181,7 @@
         },
         "initialConfigurations": [
           {
-            "type": "mock",
+            "type": "flow",
             "request": "launch",
             "name": "Ask for file name",
             "program": "${workspaceFolder}/${command:AskForProgramName}",
@@ -189,10 +190,10 @@
         ],
         "configurationSnippets": [
           {
-            "label": "Mock Debug: Launch",
+            "label": "Flow Debug: Launch",
             "description": "A new configuration for 'debugging' a user selected markdown file.",
             "body": {
-              "type": "mock",
+              "type": "flow",
               "request": "launch",
               "name": "Ask for file name",
               "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
@@ -201,9 +202,16 @@
           }
         ],
         "variables": {
-          "AskForProgramName": "extension.mock-debug.getProgramName"
+          "AskForProgramName": "extension.flow-debug.getProgramName"
         }
       }
     ]
+  },
+  "dependencies": {
+    "astring": "^1.8.1",
+    "espree": "^9.3.1",
+    "estree-walker": "^2.0.2",
+    "nyc": "^15.1.0",
+    "temp": "^0.9.4"
   }
 }
