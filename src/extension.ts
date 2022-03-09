@@ -2,7 +2,7 @@
 
 import * as Net from 'net';
 import * as vscode from 'vscode';
-import { LoggingDebugSession } from '@vscode/debugadapter';
+import Registry from 'winreg';
 import { activateFlowDebug } from './activateFlowDebug';
 
 /*
@@ -26,13 +26,27 @@ export function deactivate() {
 	// nothing to do
 }
 
+async function readPort():Promise<number> {
+	return new Promise(function(resolve, reject) {
+	let key = new Registry({                                     
+		hive: Registry.HKCU,                                       
+		key:  '\\Software\\Sirenia\\Manatee\\Ports' 
+	  });
+	  key.get("websocketserver",function (err, item /* array of RegistryItem */) {
+		if (err) { reject(err); }
+		else { resolve(Number.parseInt(item.value)); }
+	  });
+	});
+}
+
 class ManateeDebugAdapterServerDescriptorFactory implements vscode.DebugAdapterDescriptorFactory {
 
 	private server?: Net.Server;
 
-	createDebugAdapterDescriptor(session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
-		// TODO detect port
-		return new vscode.DebugAdapterServer(50000);
+	async createDebugAdapterDescriptor(session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): Promise<vscode.ProviderResult<vscode.DebugAdapterDescriptor>> {
+		// TODO detect port, prefer configured port
+		var port = await readPort();
+		return new vscode.DebugAdapterServer(port);
 	}
 
 	dispose() {

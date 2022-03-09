@@ -14,7 +14,7 @@
   "engines": {
     "vscode": "^1.64.0"
   },
-  "icon": "images/mock-debug-icon.png", 
+  "icon": "images/mock-debug-icon.png",
   "categories": [
     "Debuggers"
   ],
@@ -212,6 +212,7 @@
     "espree": "^9.3.1",
     "estree-walker": "^2.0.2",
     "nyc": "^15.1.0",
-    "temp": "^0.9.4"
+    "temp": "^0.9.4",
+    "winreg": "^1.2.4"
   }
 }
